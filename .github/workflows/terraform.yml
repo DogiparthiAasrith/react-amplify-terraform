@@ -1,0 +1,71 @@
+name: Terraform AWS Amplify
+
+on:
+  push:
+    branches:
+      - main
+
+  workflow_dispatch:
+    inputs:
+      action:
+        description: 'Action to perform'
+        required: true
+        type: choice
+        options:
+          - plan
+          - plan-apply
+          - plan-destroy
+      destroy_confirm:
+        description: 'Type DELETE to confirm destroy'
+        required: false
+        type: string
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: terraform
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: us-east-1
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.14.3
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Terraform Plan
+        if: github.event_name == 'push' || github.event.inputs.action == 'plan' || github.event.inputs.action == 'plan-apply'
+        run: terraform plan -var="repository_url=${{ github.server_url }}/${{ github.repository }}" -var="github_access_token=${{ secrets.GH_ACCESS_TOKEN }}"
+
+      - name: Terraform Plan Destroy
+        if: github.event.inputs.action == 'plan-destroy'
+        run: |
+          if [ "${{ github.event.inputs.destroy_confirm }}" != "DELETE" ]; then
+            echo "Type DELETE to confirm destroy"
+            exit 1
+          fi
+          terraform plan -destroy -var="repository_url=${{ github.server_url }}/${{ github.repository }}" -var="github_access_token=${{ secrets.GH_ACCESS_TOKEN }}"
+
+      - name: Terraform Apply
+        if: github.event.inputs.action == 'plan-apply'
+        run: terraform apply -auto-approve -var="repository_url=${{ github.server_url }}/${{ github.repository }}" -var="github_access_token=${{ secrets.GH_ACCESS_TOKEN }}"
+
+      - name: Terraform Destroy
+        if: github.event.inputs.action == 'plan-destroy' && github.event.inputs.destroy_confirm == 'DELETE'
+        run: terraform destroy -auto-approve -var="repository_url=${{ github.server_url }}/${{ github.repository }}" -var="github_access_token=${{ secrets.GH_ACCESS_TOKEN }}"
