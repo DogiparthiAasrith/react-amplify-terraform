@@ -33,7 +33,6 @@ variable "branch_name" {
   default     = "main"
 }
 
-variable "amplify_service_role_arn" {
-  description = "IAM role ARN for Amplify service"
-  type        = string
-}
+# Note: amplify_service_role_arn variable removed
+# The Amplify service role is now created by Terraform in main.tf
+# This ensures proper trust relationship with amplify.amazonaws.com
