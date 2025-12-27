@@ -32,3 +32,8 @@ variable "branch_name" {
   type        = string
   default     = "main"
 }
+
+variable "amplify_service_role_arn" {
+  description = "IAM role ARN for Amplify service"
+  type        = string
+}
