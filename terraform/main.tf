@@ -15,7 +15,7 @@ resource "aws_amplify_app" "react_app" {
         preBuild:
           commands:
             - cd frontend
-            - npm ci
+            - npm install
         build:
           commands:
             - npm run build
