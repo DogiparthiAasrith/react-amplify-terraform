@@ -21,38 +21,16 @@ resource "aws_iam_role" "amplify_service_role" {
   }
 }
 
-# IAM Policy for Amplify Service Role
-resource "aws_iam_role_policy" "amplify_service_policy" {
-  name = "${var.project_name}-amplify-service-policy"
-  role = aws_iam_role.amplify_service_role.id
-
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Effect = "Allow"
-        Action = [
-          "amplify:*"
-        ]
-        Resource = "*"
-      },
-      {
-        Effect = "Allow"
-        Action = [
-          "logs:CreateLogGroup",
-          "logs:CreateLogStream",
-          "logs:PutLogEvents"
-        ]
-        Resource = "arn:aws:logs:*:*:log-group:/aws/amplify/*"
-      }
-    ]
-  })
+# IAM Policy for Amplify Service Role - Using AWS Managed Policy
+resource "aws_iam_role_policy_attachment" "amplify_admin" {
+  role       = aws_iam_role.amplify_service_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AdministratorAccess-Amplify"
 }
 
 # Wait for IAM role to propagate
 resource "time_sleep" "wait_for_iam" {
-  depends_on      = [aws_iam_role_policy.amplify_service_policy]
-  create_duration = "10s"
+  depends_on      = [aws_iam_role_policy_attachment.amplify_admin]
+  create_duration = "15s"
 }
 
 # AWS Amplify App
