@@ -47,7 +47,7 @@ jobs:
 
       - name: Terraform Plan
         if: github.event.inputs.action == 'plan' || github.event.inputs.action == 'plan-apply'
-        run: terraform plan -var="repository_url=${{ github.server_url }}/${{ github.repository }}" -var="github_access_token=${{ secrets.GH_ACCESS_TOKEN }}" -var="amplify_service_role_arn=${{ secrets.AWS_ROLE_ARN }}"
+        run: terraform plan -var="repository_url=${{ github.server_url }}/${{ github.repository }}" -var="github_access_token=${{ secrets.GH_ACCESS_TOKEN }}"
 
       - name: Terraform Plan Destroy
         if: github.event.inputs.action == 'plan-destroy'
@@ -56,12 +56,12 @@ jobs:
             echo "Type DELETE to confirm destroy"
             exit 1
           fi
-          terraform plan -destroy -var="repository_url=${{ github.server_url }}/${{ github.repository }}" -var="github_access_token=${{ secrets.GH_ACCESS_TOKEN }}" -var="amplify_service_role_arn=${{ secrets.AWS_ROLE_ARN }}"
+          terraform plan -destroy -var="repository_url=${{ github.server_url }}/${{ github.repository }}" -var="github_access_token=${{ secrets.GH_ACCESS_TOKEN }}"
 
       - name: Terraform Apply
         if: github.event.inputs.action == 'plan-apply'
-        run: terraform apply -auto-approve -var="repository_url=${{ github.server_url }}/${{ github.repository }}" -var="github_access_token=${{ secrets.GH_ACCESS_TOKEN }}" -var="amplify_service_role_arn=${{ secrets.AWS_ROLE_ARN }}"
+        run: terraform apply -auto-approve -var="repository_url=${{ github.server_url }}/${{ github.repository }}" -var="github_access_token=${{ secrets.GH_ACCESS_TOKEN }}"
 
       - name: Terraform Destroy
         if: github.event.inputs.action == 'plan-destroy' && github.event.inputs.destroy_confirm == 'DELETE'
-        run: terraform destroy -auto-approve -var="repository_url=${{ github.server_url }}/${{ github.repository }}" -var="github_access_token=${{ secrets.GH_ACCESS_TOKEN }}" -var="amplify_service_role_arn=${{ secrets.AWS_ROLE_ARN }}"
+        run: terraform destroy -auto-approve -var="repository_url=${{ github.server_url }}/${{ github.repository }}" -var="github_access_token=${{ secrets.GH_ACCESS_TOKEN }}"
