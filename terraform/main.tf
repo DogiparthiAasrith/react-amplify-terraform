@@ -1,3 +1,27 @@
+# IAM Role for Amplify Service
+resource "aws_iam_role" "amplify_service_role" {
+  name = "${var.project_name}-amplify-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Principal = {
+          Service = "amplify.amazonaws.com"
+        }
+        Action = "sts:AssumeRole"
+      }
+    ]
+  })
+}
+
+# Attach AWS managed policy for Amplify
+resource "aws_iam_role_policy_attachment" "amplify_policy" {
+  role       = aws_iam_role.amplify_service_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AdministratorAccess-Amplify"
+}
+
 # AWS Amplify App
 resource "aws_amplify_app" "react_app" {
   name       = var.project_name
@@ -5,6 +29,9 @@ resource "aws_amplify_app" "react_app" {
 
   # GitHub personal access token
   access_token = var.github_access_token
+
+  # Service role for Amplify
+  iam_service_role_arn = aws_iam_role.amplify_service_role.arn
 
   # Build settings for React app
   build_spec = <<-EOT
@@ -43,6 +70,8 @@ resource "aws_amplify_app" "react_app" {
     status = "200"
     target = "/index.html"
   }
+
+  depends_on = [aws_iam_role_policy_attachment.amplify_policy]
 }
 
 # Amplify Branch
