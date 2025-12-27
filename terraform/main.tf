@@ -49,6 +49,12 @@ resource "aws_iam_role_policy" "amplify_service_policy" {
   })
 }
 
+# Wait for IAM role to propagate
+resource "time_sleep" "wait_for_iam" {
+  depends_on      = [aws_iam_role_policy.amplify_service_policy]
+  create_duration = "10s"
+}
+
 # AWS Amplify App
 resource "aws_amplify_app" "react_app" {
   name       = var.project_name
@@ -56,6 +62,8 @@ resource "aws_amplify_app" "react_app" {
 
   access_token         = var.github_access_token
   iam_service_role_arn = aws_iam_role.amplify_service_role.arn
+
+  depends_on = [time_sleep.wait_for_iam]
 
   # Build settings for React app
   build_spec = <<-EOT
