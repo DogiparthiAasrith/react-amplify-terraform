@@ -1,11 +1,16 @@
+# Data source to get current AWS account ID
+data "aws_caller_identity" "current" {}
+
 # IAM Role for Amplify Service (separate from OIDC role)
 resource "aws_iam_role" "amplify_service_role" {
   name = "${var.project_name}-amplify-service-role"
 
+  # Trust policy allowing Amplify service to assume this role
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
       {
+        Sid    = "AllowAmplifyAssumeRole"
         Effect = "Allow"
         Principal = {
           Service = "amplify.amazonaws.com"
@@ -30,7 +35,7 @@ resource "aws_iam_role_policy_attachment" "amplify_admin" {
 # Wait for IAM role to propagate
 resource "time_sleep" "wait_for_iam" {
   depends_on      = [aws_iam_role_policy_attachment.amplify_admin]
-  create_duration = "15s"
+  create_duration = "20s"
 }
 
 # AWS Amplify App
