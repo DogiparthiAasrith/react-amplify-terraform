@@ -50,6 +50,7 @@ aws s3api put-bucket-versioning \
 5. Click "Add provider"
 
 Then create an IAM Role:
+
 1. IAM → Roles → Create role
 2. Select "Web identity" → Choose the GitHub provider → Audience: `sts.amazonaws.com`
 3. Add condition: `token.actions.githubusercontent.com:sub` → StringLike → `repo:YOUR-ORG/YOUR-REPO:*`
@@ -97,6 +98,19 @@ backend "s3" {
 | `plan-and-apply` | Plans and applies changes to create/update infrastructure |
 | `plan-and-destroy` | Plans and destroys all infrastructure (safety confirmation required) |
 
+## Reusing This Template for Another Project
+
+To deploy a different React app using this setup:
+
+1. **Create a new S3 bucket or use a unique state key** in `provider.tf`
+2. **Generate a GitHub Personal Access Token** with `repo` scope
+3. **Push your React app** to GitHub (must have `frontend/` folder structure)
+4. **Update required variables**:
+   - `repository_url` - Your GitHub repo URL
+   - `github_access_token` - Your PAT
+   - `project_name` - Unique name for your app
+5. **Run Terraform** (`init` → `plan` → `apply`)
+
 ## Local Development
 
 ```bash
@@ -128,6 +142,7 @@ terraform apply \
 ## Outputs
 
 After successful deployment:
+
 - `amplify_app_id` - Amplify application ID
 - `amplify_default_domain` - Default Amplify domain
 - `amplify_branch_url` - Full URL to access your app
