@@ -1,0 +1,39 @@
+version: 0.2
+
+phases:
+  install:
+    commands:
+      - echo "Installing Terraform..."
+      - wget https://releases.hashicorp.com/terraform/1.14.3/terraform_1.14.3_linux_amd64.zip
+      - unzip terraform_1.14.3_linux_amd64.zip
+      - mv terraform /usr/local/bin/
+      - terraform --version
+
+  pre_build:
+    commands:
+      - echo "Initializing Terraform..."
+      - cd terraform
+      - terraform init
+
+  build:
+    commands:
+      - |
+        if [ "$TERRAFORM_ACTION" = "plan" ]; then
+          echo "Running Terraform Plan..."
+          terraform plan -var="repository_url=$REPOSITORY_URL" -var="github_access_token=$GITHUB_ACCESS_TOKEN" -out=tfplan
+        elif [ "$TERRAFORM_ACTION" = "apply" ]; then
+          echo "Running Terraform Apply..."
+          terraform apply -auto-approve -var="repository_url=$REPOSITORY_URL" -var="github_access_token=$GITHUB_ACCESS_TOKEN"
+        else
+          echo "Error: TERRAFORM_ACTION must be 'plan' or 'apply'"
+          exit 1
+        fi
+
+  post_build:
+    commands:
+      - echo "Terraform $TERRAFORM_ACTION completed successfully"
+
+artifacts:
+  files:
+    - terraform/tfplan
+    - terraform/**/*
