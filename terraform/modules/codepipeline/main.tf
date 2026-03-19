@@ -200,7 +200,7 @@ resource "aws_codebuild_project" "terraform_plan" {
 
   source {
     type      = "CODEPIPELINE"
-    buildspec = "terraform/buildspecs/terraform.yml"
+    buildspec = "buildspecs/terraform.yml"
   }
 }
 
@@ -241,7 +241,7 @@ resource "aws_codebuild_project" "terraform_apply" {
 
   source {
     type      = "CODEPIPELINE"
-    buildspec = "terraform/buildspecs/terraform.yml"
+    buildspec = "buildspecs/terraform.yml"
   }
 }
 
