@@ -201,32 +201,32 @@ resource "aws_codebuild_project" "terraform_plan" {
   source {
     type = "CODEPIPELINE"
     buildspec = <<-EOT
-      version: 0.2
-      phases:
-        install:
-          commands:
-            - echo "Installing Terraform..."
-            - wget https://releases.hashicorp.com/terraform/1.14.3/terraform_1.14.3_linux_amd64.zip
-            - unzip terraform_1.14.3_linux_amd64.zip
-            - mv terraform /usr/local/bin/
-            - terraform --version
-        pre_build:
-          commands:
-            - echo "Initializing Terraform..."
-            - cd terraform
-            - terraform init
-        build:
-          commands:
-            - echo "Running Terraform Plan..."
-            - terraform plan -var="repository_url=$REPOSITORY_URL" -var="github_access_token=$GITHUB_ACCESS_TOKEN" -out=tfplan
-        post_build:
-          commands:
-            - echo "Terraform plan completed successfully"
-      artifacts:
-        files:
-          - terraform/tfplan
-          - terraform/**/*
-    EOT
+version: 0.2
+phases:
+  install:
+    commands:
+      - echo "Installing Terraform..."
+      - wget https://releases.hashicorp.com/terraform/1.14.3/terraform_1.14.3_linux_amd64.zip
+      - unzip terraform_1.14.3_linux_amd64.zip
+      - mv terraform /usr/local/bin/
+      - terraform --version
+  pre_build:
+    commands:
+      - echo "Initializing Terraform..."
+      - cd terraform
+      - terraform init
+  build:
+    commands:
+      - echo "Running Terraform Plan..."
+      - terraform plan -var="repository_url=$REPOSITORY_URL" -var="github_access_token=$GITHUB_ACCESS_TOKEN" -out=tfplan
+  post_build:
+    commands:
+      - echo "Terraform plan completed successfully"
+artifacts:
+  files:
+    - terraform/tfplan
+    - terraform/**/*
+EOT
   }
 }
 
@@ -262,31 +262,31 @@ resource "aws_codebuild_project" "terraform_apply" {
   source {
     type = "CODEPIPELINE"
     buildspec = <<-EOT
-      version: 0.2
-      phases:
-        install:
-          commands:
-            - echo "Installing Terraform..."
-            - wget https://releases.hashicorp.com/terraform/1.14.3/terraform_1.14.3_linux_amd64.zip
-            - unzip terraform_1.14.3_linux_amd64.zip
-            - mv terraform /usr/local/bin/
-            - terraform --version
-        pre_build:
-          commands:
-            - echo "Initializing Terraform..."
-            - cd terraform
-            - terraform init
-        build:
-          commands:
-            - echo "Running Terraform Apply..."
-            - terraform apply -auto-approve -var="repository_url=$REPOSITORY_URL" -var="github_access_token=$GITHUB_ACCESS_TOKEN"
-        post_build:
-          commands:
-            - echo "Terraform apply completed successfully"
-      artifacts:
-        files:
-          - terraform/**/*
-    EOT
+version: 0.2
+phases:
+  install:
+    commands:
+      - echo "Installing Terraform..."
+      - wget https://releases.hashicorp.com/terraform/1.14.3/terraform_1.14.3_linux_amd64.zip
+      - unzip terraform_1.14.3_linux_amd64.zip
+      - mv terraform /usr/local/bin/
+      - terraform --version
+  pre_build:
+    commands:
+      - echo "Initializing Terraform..."
+      - cd terraform
+      - terraform init
+  build:
+    commands:
+      - echo "Running Terraform Apply..."
+      - terraform apply -auto-approve -var="repository_url=$REPOSITORY_URL" -var="github_access_token=$GITHUB_ACCESS_TOKEN"
+  post_build:
+    commands:
+      - echo "Terraform apply completed successfully"
+artifacts:
+  files:
+    - terraform/**/*
+EOT
   }
 }
 
